@@ -57,7 +57,7 @@ export const calculateHealthMetrics = (data: HealthData): CalculatedFeatures => 
 };
 
 // Function to call Flask API and get the prediction
-export const predictCardiovascularRisk = async (data: HealthData): Promise<PredictionResult> => {
+export const predictCardiovascularRisk = async (data: HealthData, features: CalculatedFeatures): Promise<PredictionResult> => {
   const url = 'https://codespaces-flask-production-0b1e.up.railway.app/predict'; // Flask API URL
   const healthMetrics = calculateHealthMetrics(data);
 

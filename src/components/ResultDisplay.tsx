@@ -43,7 +43,7 @@ const ResultDisplay = ({
           </div>
           
           <div className="text-3xl font-bold mb-1">
-            {risk === 0 ? 'Low Risk' : 'High Risk'}
+            {risk === 'Low' ? 'Low Risk' : 'High Risk'}
           </div>
           
           <div className="text-xl">

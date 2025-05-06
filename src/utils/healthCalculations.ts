@@ -27,7 +27,6 @@ export interface PredictionResult {
 
 // Calculate Body Mass Index
 export const calculateBMI = (weight: number, height: number): number => {
-  // Height in cm converted to meters
   const heightInMeters = height / 100;
   return Number((weight / (heightInMeters * heightInMeters)).toFixed(2));
 };
@@ -57,50 +56,73 @@ export const calculateHealthMetrics = (data: HealthData): CalculatedFeatures => 
   };
 };
 
-// Simulate a prediction result
-// In a real application, this would call a backend API
-export const predictCardiovascularRisk = (
-  data: HealthData, 
-  calculatedFeatures: CalculatedFeatures
-): PredictionResult => {
-  // This is a simplified model for demonstration purposes only
-  // A real model would use more sophisticated algorithms
-  
-  // Risk factors that increase probability
-  let baseRisk = 0.05; // 5% base risk
-  
-  // Age factor (risk increases with age)
-  baseRisk += (data.age - 20) * 0.005;
-  
-  // Gender factor
-  if (data.gender === 'Male') baseRisk += 0.05;
-  
-  // Cholesterol factor
-  if (data.cholesterol === 'Above Normal') baseRisk += 0.07;
-  if (data.cholesterol === 'Well Above Normal') baseRisk += 0.15;
-  
-  // Glucose factor
-  if (data.glucose === 'Above Normal') baseRisk += 0.05;
-  if (data.glucose === 'Well Above Normal') baseRisk += 0.1;
-  
-  // Lifestyle factors
-  if (data.smoking) baseRisk += 0.15;
-  if (data.alcohol) baseRisk += 0.08;
-  if (!data.physicalActivity) baseRisk += 0.12;
-  
-  // BMI factor
-  if (calculatedFeatures.bmi > 25) baseRisk += 0.05;
-  if (calculatedFeatures.bmi > 30) baseRisk += 0.1;
-  
-  // Blood pressure factors
-  if (data.ap_hi > 140) baseRisk += 0.15;
-  if (data.ap_lo > 90) baseRisk += 0.1;
-  
-  // Calculate final probability (capped at 95%)
-  const probability = Math.min(baseRisk, 0.95);
-  
-  return {
-    risk: probability > 0.3 ? 'High' : 'Low',
-    probability: Number((probability * 100).toFixed(1))
+// Function to call Flask API and get the prediction
+export const predictCardiovascularRisk = async (data: HealthData): Promise<PredictionResult> => {
+  const url = 'https://codespaces-flask-production-0b1e.up.railway.app/predict'; // Flask API URL
+  const healthMetrics = calculateHealthMetrics(data);
+
+  const requestPayload = {
+    age: data.age,
+    gender: data.gender === 'Male' ? 1 : 0, // Convert gender to numeric for the model
+    cholesterol: mapCholesterol(data.cholesterol),
+    gluc: mapGlucose(data.glucose),
+    smoke: data.smoking ? 1 : 0,
+    alco: data.alcohol ? 1 : 0,
+    active: data.physicalActivity ? 1 : 0,
+    height: data.height,
+    weight: data.weight,
+    ap_hi: data.ap_hi,
+    ap_lo: data.ap_lo,
+    bmi: healthMetrics.bmi,
+    pulse_pressure: healthMetrics.pulsePressure,
+    map: healthMetrics.map,
+    age_bmi_interaction: healthMetrics.ageBmiInteraction,
+    pulse_map_interaction: healthMetrics.pulseMapInteraction
   };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestPayload)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch prediction from API');
+    }
+
+    const result = await response.json();
+    const { prediction, probability } = result;
+
+    return {
+      risk: prediction === 1 ? 'High' : 'Low',
+      probability: probability
+    };
+
+  } catch (error) {
+    console.error('Error in API call:', error);
+    return { risk: 'Low', probability: 0 }; // Return a default low risk if something goes wrong
+  }
+};
+
+// Helper function to map cholesterol levels to the model's expected input
+const mapCholesterol = (cholesterol: 'Normal' | 'Above Normal' | 'Well Above Normal'): number => {
+  switch (cholesterol) {
+    case 'Normal': return 1;
+    case 'Above Normal': return 2;
+    case 'Well Above Normal': return 3;
+    default: return 1;
+  }
+};
+
+// Helper function to map glucose levels to the model's expected input
+const mapGlucose = (glucose: 'Normal' | 'Above Normal' | 'Well Above Normal'): number => {
+  switch (glucose) {
+    case 'Normal': return 1;
+    case 'Above Normal': return 2;
+    case 'Well Above Normal': return 3;
+    default: return 1;
+  }
 };

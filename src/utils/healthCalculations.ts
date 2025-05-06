@@ -1,4 +1,3 @@
-
 export interface HealthData {
   age: number;
   gender: 'Male' | 'Female';
@@ -40,7 +39,7 @@ export const calculatePulsePressure = (systolic: number, diastolic: number): num
 
 // Calculate Mean Arterial Pressure
 export const calculateMAP = (systolic: number, diastolic: number): number => {
-  return Number(((diastolic * 2) + systolic) / 3).toFixed(2);
+  return Number(((diastolic * 2) + systolic) / 3);
 };
 
 // Calculate all derived health metrics

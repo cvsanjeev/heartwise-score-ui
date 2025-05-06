@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Card,
@@ -13,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Heart, Weight, Height, BloodPressure, Smoking, Activity, Calculator } from "lucide-react";
+import { Heart, Weight, Activity, Calculator, CircleX } from "lucide-react";
 import { HealthData, calculateHealthMetrics, predictCardiovascularRisk, CalculatedFeatures, PredictionResult } from "@/utils/healthCalculations";
 import ResultDisplay from "./ResultDisplay";
 import { toast } from "@/components/ui/use-toast";
@@ -193,7 +192,7 @@ const CardiovascularForm = () => {
               <div className="grid grid-cols-1 gap-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Smoking size={20} className="text-gray-500" />
+                    <CircleX size={20} className="text-gray-500" />
                     <Label className="form-label m-0">Smoking</Label>
                   </div>
                   <Switch
@@ -245,7 +244,7 @@ const CardiovascularForm = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="form-group">
                   <Label className="form-label flex items-center gap-1">
-                    <Height size={16} />
+                    <Weight size={16} />
                     Height (cm)
                   </Label>
                   <Input
@@ -276,7 +275,7 @@ const CardiovascularForm = () => {
             
             <div className="form-section">
               <h3 className="form-section-title flex items-center gap-1">
-                <BloodPressure size={20} className="text-gray-500" />
+                <Heart size={20} className="text-gray-500" />
                 Blood Pressure
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
